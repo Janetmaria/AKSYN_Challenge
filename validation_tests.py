@@ -295,3 +295,26 @@ else:
 print()
 print(f"  Validation run: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 print("=" * 60)
+
+report_filename = 'validation_report.md'
+if wav_found and wav_path:
+    base = os.path.basename(wav_path).replace('received_audio_', '').replace('.wav', '')
+    if base:
+        report_filename = f'validation_report_{base}.md'
+
+with open(report_filename, 'w', encoding='utf-8') as f:
+    f.write("# AKSYN Audio Pipeline - Validation Report\n\n")
+    f.write(f"**Validation run:** {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+    f.write("## Test Results\n\n")
+    f.write("| SR | Name | Status | Measured |\n")
+    f.write("|----|------|--------|----------|\n")
+    for r in results:
+        icon = "✅ PASS" if r["passed"] else "❌ FAIL"
+        f.write(f"| {r['sr']} | {r['name']} | {icon} | {r['measured']} |\n")
+    f.write("\n")
+    f.write(f"**Result:** {passed_count}/{total_count} tests passed "
+            f"({(passed_count/total_count)*100:.0f}%)\n")
+    if passed_count == total_count:
+        f.write("\n🎯 **ALL REQUIREMENTS VALIDATED SUCCESSFULLY**\n")
+    else:
+        f.write(f"\n⚠ **{total_count - passed_count} test(s) failed.**\n")
